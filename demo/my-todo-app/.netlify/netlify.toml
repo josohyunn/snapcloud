@@ -1,0 +1,30 @@
+functionsDirectory = "C:\\Users\\joso9\\Desktop\\SnapCloud\\demo\\my-todo-app\\netlify\\functions"
+functionsDirectoryOrigin = "default"
+plugins = []
+headers = []
+redirects = []
+
+[build]
+publish = "C:\\Users\\joso9\\Desktop\\SnapCloud\\demo\\my-todo-app\\build"
+publishOrigin = "ui"
+commandOrigin = "ui"
+command = "npm run build"
+functions = "C:\\Users\\joso9\\Desktop\\SnapCloud\\demo\\my-todo-app\\netlify\\functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
