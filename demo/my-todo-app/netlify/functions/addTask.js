@@ -24,7 +24,7 @@ module.exports.handler = async (event, context) => {
         "Access-Control-Allow-Headers": "Content-Type",  // 요청 헤더 허용
         "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"  // 허용된 HTTP 메소드
       },
-      body: JSON.stringify({ message: Task added successfully: ${task} }),
+      body: JSON.stringify({ message: `Task added successfully: ${task} `}),
     };
   }
 
