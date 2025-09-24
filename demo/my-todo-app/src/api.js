@@ -1,4 +1,4 @@
-const API_URL = "https://aesthetic-kashata-05eda9.netlify.app/.netlify/functions";
+const API_URL = "https://snapcloudpj.netlify.app/.netlify/functions";
 
 /**
  * 전체 조회 또는 단일 Task 조회
