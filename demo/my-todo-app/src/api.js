@@ -1,4 +1,4 @@
-const API_URL = "https://68d3f38bef1aaf616e2a7b18--unique-dango-cc6a72.netlify.app/.netlify/functions/addTask";
+const API_URL = "https://68d4180403c9bb0612f191d7--snapcloudpj.netlify.app/.netlify/functions/addTask";
 
 
 /**
