@@ -1,7 +1,7 @@
 const { DynamoDB } = require('aws-sdk');
 const ddb = new DynamoDB.DocumentClient();
 
-exports.handler = async (event, context) => {
+module.exports.handler = async (event, context) => {
     if (event.httpMethod === "DELETE") {
         const taskId = event.queryStringParameters?.taskId;
 

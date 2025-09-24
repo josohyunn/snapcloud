@@ -1,7 +1,7 @@
 const { DynamoDB } = require('aws-sdk');
 const ddb = new DynamoDB.DocumentClient();
 
-exports.handler = async (event, context) => {
+module.exports.handler = async (event, context) => {
     if (event.httpMethod === "PUT") {
         const data = JSON.parse(event.body);  // 요청 본문에서 데이터 받기
 

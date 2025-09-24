@@ -1,4 +1,4 @@
-const API_URL = "https://snapcloudpj.netlify.app/netlify/functions/getTask";
+const API_URL = "https://snapcloudpj.netlify.app/netlify/functions";
 
 /**
  * 전체 조회 또는 단일 Task 조회
