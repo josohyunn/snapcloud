@@ -14,11 +14,9 @@ module.exports.handler = async (event, context) => {
     };
   }
 
+  // POST 요청 처리 (작업 추가)
   if (event.httpMethod === 'POST') {
-    const { task } = JSON.parse(event.body);
-
-    // 여기에 작업을 추가하는 로직을 넣어주세요 (예: DB에 저장)
-
+    const { task } = JSON.parse(event.body);  // 요청 본문에서 task 데이터 받기
     return {
       statusCode: 200,
       headers: {
@@ -26,7 +24,24 @@ module.exports.handler = async (event, context) => {
         "Access-Control-Allow-Headers": "Content-Type",  // 요청 헤더 허용
         "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"  // 허용된 HTTP 메소드
       },
-      body: JSON.stringify({ message: `Task added successfully: ${task}` }),
+      body: JSON.stringify({ message: Task added successfully: ${task} }),
+    };
+  }
+
+  // GET 요청 처리 (작업 조회) - 이 부분 추가
+  if (event.httpMethod === 'GET') {
+    const tasks = [
+      { id: 1, task: "Task 1" },
+      { id: 2, task: "Task 2" }
+    ];
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"
+      },
+      body: JSON.stringify({ tasks })
     };
   }
 
