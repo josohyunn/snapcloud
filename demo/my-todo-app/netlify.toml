@@ -1,6 +1,0 @@
-[build]
-  functions = "netlify/functions"  # Netlify Functions 폴더 경로 설정
-  publish = "build"  # React 빌드 폴더 설정
-
-[[plugins]]
-  package = "@netlify/plugin-functions-core"
