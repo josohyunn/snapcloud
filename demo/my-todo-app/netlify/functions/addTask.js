@@ -1,52 +1,76 @@
 // netlify/functions/addTask.js
 
-module.exports.handler = async (event, context) => {
-  // OPTIONS 요청 처리 (CORS 허용)
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "",  // 모든 출처에서 요청 허용
-        "Access-Control-Allow-Headers": "Content-Type",  // 요청 헤더 허용
-        "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"  // 허용된 HTTP 메소드
-      },
-      body: "",
-    };
+const AWS = require("aws-sdk");
+const dynamoDb = new AWS.DynamoDB.DocumentClient();  // DynamoDB 클라이언트 생성
+const uuid = require('uuid');  // taskId 생성을 위한 UUID 라이브러리
+
+module.exports.handler = async function (event, context) {
+  // OPTIONS 요청 처리 (CORS 설정)
+  if (event.httpMethod === "OPTIONS") {
+    return createCorsResponse();  // CORS 응답 처리
   }
 
-  // POST 요청 처리 (작업 추가)
-  if (event.httpMethod === 'POST') {
-    const { task } = JSON.parse(event.body);  // 요청 본문에서 task 데이터 받기
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "",  // 모든 출처에서 요청 허용
-        "Access-Control-Allow-Headers": "Content-Type",  // 요청 헤더 허용
-        "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"  // 허용된 HTTP 메소드
-      },
-      body: JSON.stringify({ message: `Task added successfully: ${task} `}),
+  // POST 요청 처리 (task 추가)
+  if (event.httpMethod === "POST") {
+    const body = JSON.parse(event.body);  // 요청 바디 파싱
+
+    const { taskName, status, dueDate, priority } = body;
+
+    // taskId는 UUID로 생성
+    const taskId = uuid.v4();  // 고유한 taskId 생성
+
+    // DynamoDB에 저장할 아이템 객체
+    const item = {
+      taskId: taskId,
+      taskName: taskName,
+      status: status || "pending",  // 기본값 "pending"
+      dueDate: dueDate || "",  // 기본값 빈 문자열
+      priority: priority || "normal",  // 기본값 "normal"
+      createdAt: new Date().toISOString(),  // 생성 시간
+      updatedAt: new Date().toISOString(),  // 수정 시간
     };
+
+    // DynamoDB에 아이템 추가
+    const params = {
+      TableName: "SnapCloud",  // DynamoDB 테이블 이름
+      Item: item,
+    };
+
+    try {
+      // DynamoDB에 아이템 추가
+      await dynamoDb.put(params).promise();
+      return createResponse(200, JSON.stringify({ message: "Task added successfully", taskId: taskId }));
+    } catch (error) {
+      return createResponse(500, JSON.stringify({ error: "Could not add task", details: error.message }));
+    }
   }
 
-  // GET 요청 처리 (작업 조회) - 이 부분 추가
-  if (event.httpMethod === 'GET') {
-    const tasks = [
-      { id: 1, task: "Task 1" },
-      { id: 2, task: "Task 2" }
-    ];
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS"
-      },
-      body: JSON.stringify({ tasks })
-    };
-  }
-
-  return {
-    statusCode: 405,  // Method Not Allowed
-    body: JSON.stringify({ message: "Method not allowed" }),
-  };
+  // 다른 HTTP 메서드에 대한 처리
+  return createResponse(405, JSON.stringify({ error: "Method Not Allowed" }));
 };
+
+// CORS 응답 처리 함수
+function createCorsResponse() {
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+    body: JSON.stringify({}),
+  };
+}
+
+// 공통 응답 처리 함수
+function createResponse(statusCode, body) {
+  return {
+    statusCode: statusCode,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+    body: body,
+  };
+}
