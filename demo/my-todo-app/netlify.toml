@@ -1,30 +1,10 @@
-functionsDirectory = "netlify/functions"
-functionsDirectoryOrigin = "default"
-plugins = []
-headers = []
-redirects = []
-
 [build]
-publish = "build"
-publishOrigin = "ui"
-commandOrigin = "ui"
-command = "npm run build"
-functions = "netlify/functions"
+  publish = "build"                 # React 빌드 결과물
+  command = "npm run build"         # 빌드 명령어
+  functions = "netlify/functions"   # Lambda 함수 코드 경로
 
-[build.environment]
-
-[build.processing]
-
-[build.processing.css]
-
-[build.processing.html]
-
-[build.processing.images]
-
-[build.processing.js]
-
-[build.services]
-
-[functions]
-
-[functions."*"]
+# React SPA 라우팅 문제 해결
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
