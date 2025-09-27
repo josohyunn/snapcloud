@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getTask, addTask, updateTask, deleteTask } from "./api";
+import { getTask, addTask, updateTask, deleteTask } from "./apiTask";
 
 function App() {
   // -------------------- State 정의 --------------------

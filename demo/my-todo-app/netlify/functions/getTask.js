@@ -1,59 +1,42 @@
-// netlify/functions/getTask.js
-
 const { DynamoDB } = require('aws-sdk');
 const ddb = new DynamoDB.DocumentClient();
 
-// CORS 응답 처리 함수
-function createCorsResponse() {
-  return {
-    statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",  // 모든 도메인 허용
-      "Access-Control-Allow-Methods": "OPTIONS,GET",  // 허용 메서드
-      "Access-Control-Allow-Headers": "Content-Type"
-    },
-    body: JSON.stringify({})
-  };
-}
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "OPTIONS,GET",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
 
-module.exports.handler = async (event, context) => {
-  // OPTIONS 요청 처리
+exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
-    return createCorsResponse();
+    return {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({})
+    };
   }
 
-  // GET 요청 처리 (DynamoDB에서 전체 Task 조회)
   if (event.httpMethod === "GET") {
-    const params = {
-      TableName: "SnapCloud"
-    };
-
+    const params = { TableName: "SnapCloud" };
     try {
       const data = await ddb.scan(params).promise();
       return {
         statusCode: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*"
-        },
+        headers: CORS_HEADERS,
         body: JSON.stringify(data.Items)
       };
     } catch (err) {
       return {
         statusCode: 500,
-        headers: {
-          "Access-Control-Allow-Origin": "*"
-        },
+        headers: CORS_HEADERS, // 꼭 있어야 함!
         body: JSON.stringify({ error: err.message })
       };
     }
   }
 
-  // GET 외의 HTTP 메서드는 405 처리
   return {
     statusCode: 405,
-    headers: {
-      "Access-Control-Allow-Origin": "*"
-    },
+    headers: CORS_HEADERS, // 이것도 꼭!
     body: JSON.stringify({ message: "Method not allowed" })
   };
 };
