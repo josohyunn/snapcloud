@@ -1,10 +1,4 @@
 [build]
-  publish = "build"                 # React 빌드 결과물
-  command = "npm run build"         # 빌드 명령어
-  functions = "netlify/functions"   # Lambda 함수 코드 경로
-
-# React SPA 라우팅 문제 해결
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  command = "npm run build"
+  publish = "build"
+  functions = "netlify/functions"

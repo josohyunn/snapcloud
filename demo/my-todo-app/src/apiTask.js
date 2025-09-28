@@ -1,74 +1,72 @@
-const API_URL = "https://68d4180403c9bb0612f191d7--snapcloudpj.netlify.app/.netlify/functions";
+const BASE = `${window.location.origin}/.netlify/functions`;
 
-/**
- * 전체 조회 또는 단일 Task 조회
- * @param {string} taskId - 조회할 taskId (옵션)
- * @returns {Array} Task 배열
- */
-export async function getTask(taskId) {
-    let url = `${API_URL}/getTask`;  // getTask 함수의 URL
-    if (taskId) url += `?taskId=${taskId}`;
-
-    const res = await fetch(url, { method: 'GET' });
-    const data = await res.json();
-    return Array.isArray(data) ? data : [data];
+function normalizeOne(t) {
+  if (!t || typeof t !== "object") return null;
+  const taskId = String(t.taskId ?? "").trim();        // ← 공백/백틱 제거 대비
+  const taskName = (t.taskName ?? t.title ?? "").toString();
+  const status = (t.status ?? "todo").toString();
+  const priority = (t.priority ?? "normal").toString();
+  const dueDate = t.dueDate ?? null;
+  const createdAt = t.createdAt ?? null;
+  const updatedAt = t.updatedAt ?? null;
+  return { taskId, taskName, status, priority, dueDate, createdAt, updatedAt };
 }
 
-/**
- * Task 추가
- * @param {Object} task - {taskId, taskName, status, dueDate, priority}
- * @returns {Object} 추가 결과
- */
-export async function addTask(task) {
-  const res = await fetch(`${API_URL}/addTask`, {  // addTask 함수의 URL
+async function request(path, options = {}) {
+  const res = await fetch(`${BASE}${path}`, options);
+  const text = await res.text();
+  if (!res.ok) {
+    try { const j = text ? JSON.parse(text) : {}; throw new Error(j.error || j.message || `HTTP ${res.status}`); }
+    catch { throw new Error(text || `HTTP ${res.status}`); }
+  }
+  if (!text) return null;
+  const data = JSON.parse(text);
+  // 배열/단건 모두 정규화
+  if (Array.isArray(data)) return data.map(normalizeOne).filter(Boolean);
+  if (data?.task) return { ...data, task: normalizeOne(data.task) };
+  return normalizeOne(data) ?? data;
+}
+
+/** 조회 */
+export function getTask(taskId) {
+  const qs = taskId ? `?taskId=${encodeURIComponent(String(taskId).trim())}` : "";
+  return request(`/tasksProxy${qs}`, { method: "GET" });
+}
+
+/** 등록(POST) — 서버가 title만 받더라도 호환되게 같이 보냄 */
+export function addTask(task) {
+  const body = {
+    ...task,
+    taskName: task.taskName ?? task.title,     // 둘 다 채워보냄
+    title: task.title ?? task.taskName,
+  };
+  return request(`/tasksProxy`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
+    body: JSON.stringify(body),
   });
-
-  const result = await res.json();
-  const parsedBody = result.body ? JSON.parse(result.body) : {};
-
-  if (!res.ok || result.statusCode >= 400) {
-    throw new Error(parsedBody.error || "taskId already exists!");
-  }
-
-  return parsedBody;
 }
 
-/**
- * Task 수정
- * @param {Object} task - {taskId, taskName, status, dueDate, priority}
- * @returns {Object} 수정 결과
- */
-export async function updateTask(task) {
-    const res = await fetch(`${API_URL}/updateTask`, {  // updateTask 함수의 URL
-        method: 'PUT',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(task)
-    });
-    const result = await res.json();
-    if (result.body) {
-        return JSON.parse(result.body);
-    }
-    return result;
+/** 수정(PUT) */
+export function updateTask(task) {
+  const body = {
+    ...task,
+    taskId: String(task.taskId).trim(),        // ← 공백/백틱 방지
+    taskName: task.taskName ?? task.title,
+    title: task.title ?? task.taskName,
+  };
+  return request(`/tasksProxy`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 }
 
-/**
- * Task 삭제
- * @param {string} taskId
- * @returns {Object} 삭제 결과
- */
-export async function deleteTask(taskId) {
-    const res = await fetch(`${API_URL}/deleteTask?taskId=${taskId}`, {  // deleteTask 함수의 URL
-        method: 'DELETE',
-        headers: { "Content-Type": "application/json" }
-    });
-
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch {
-        return { message: text || "Task deleted" };
-    }
+/** 삭제(DELETE) */
+export function deleteTask(taskId) {
+  const id = String(taskId ?? "").trim();   // ← "6742367 " 같은 공백 제거
+  return fetch(`${window.location.origin}/.netlify/functions/tasksProxy?taskId=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  }).then(r => r.json());
 }
+

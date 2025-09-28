@@ -11,6 +11,7 @@ function App() {
     dueDate: "",
     priority: "normal",
   });
+   const [statusMsg, setStatusMsg] = useState("");
   const [updateForm, setUpdateForm] = useState({
     taskId: "",
     taskName: "",
@@ -19,7 +20,7 @@ function App() {
     priority: "normal",
   });
   const [isUpdating, setIsUpdating] = useState(false);
-  const [statusMsg, setStatusMsg] = useState("");
+ 
 
   // -------------------- 스타일 정의 --------------------
   const formStyle = {
@@ -55,11 +56,11 @@ function App() {
 
   // Task 추가
   const handleAdd = async () => {
-    if (!form.taskId || form.taskName) {
-      setStatusMsg("taskId and tastName are required");
+    if (!form.taskId || !form.taskName) {
+      setStatusMsg("Task ID and Name are required");
       return;
     }
-    try {
+     try {
       const res = await addTask(form);
       setStatusMsg(res.message || "Task added!");
       await fetchTasks(); // 추가 후 전체 조회
@@ -151,22 +152,22 @@ function App() {
 
       {/* Task List */}
       {/* Task List */}
-      <ul>
-        {Array.isArray(tasks) &&
-          tasks.map((task) => (
-            <li key={task.taskId}>
-              <strong>ID:</strong> {task.taskId} | <strong>Name:</strong> {task.taskName} |{" "}
-              <strong>Status:</strong> {task.status} | <strong>Priority:</strong> {task.priority} |{" "}
-              <strong>Due:</strong> {task.dueDate}
-              <button style={deleteButtonStyle} onClick={() => handleDelete(task.taskId)}>
-                Delete
-              </button>
-              <button style={updateButtonStyle} onClick={() => startUpdate(task)}>
-                Update
-              </button>
-            </li>
-          ))}
-      </ul>
+<ul>
+  {Array.isArray(tasks) &&
+    tasks.map((task) => (
+      <li key={task.taskId}>
+        <strong>ID:</strong> {task.taskId} | <strong>Name:</strong> {task.taskName} |{" "}
+        <strong>Status:</strong> {task.status} | <strong>Priority:</strong> {task.priority} |{" "}
+        <strong>Due:</strong> {task.dueDate}
+        <button style={deleteButtonStyle} onClick={() => handleDelete(task.taskId)}>
+          Delete
+        </button>
+        <button style={updateButtonStyle} onClick={() => startUpdate(task)}>
+          Update
+        </button>
+      </li>
+    ))}
+</ul>
 
 
       {/* Update Task Form */}
