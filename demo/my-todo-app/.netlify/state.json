@@ -1,3 +1,21 @@
 {
-	"siteId": "20c2131c-5d7b-4b5c-8ad2-2993a61a2233"
+	"siteId": "20c2131c-5d7b-4b5c-8ad2-2993a61a2233",
+	"geolocation": {
+		"data": {
+			"city": "Nam-gu",
+			"country": {
+				"code": "KR",
+				"name": "South Korea"
+			},
+			"subdivision": {
+				"code": "26",
+				"name": "Busan"
+			},
+			"timezone": "Asia/Seoul",
+			"latitude": 35.1271,
+			"longitude": 129.1008,
+			"postalCode": "485"
+		},
+		"timestamp": 1759070434899
+	}
 }
